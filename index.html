@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Clone + Musicolet Lyrics</title>
-    <!-- Iconos de Google Font -->
+    <!-- Iconos oficiales de Google Fonts -->
     <link rel="stylesheet" href="https://googleapis.com" />
     <style>
         :root {
@@ -28,7 +28,6 @@
             user-select: none;
         }
 
-        /* Contenedor Principal */
         .app-container {
             display: flex;
             flex: 1;
@@ -36,7 +35,6 @@
             overflow: hidden;
         }
 
-        /* Buscador y Sidebar Estilo Spotify */
         .sidebar {
             width: 320px;
             background-color: var(--bg-sidebar);
@@ -46,13 +44,14 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            box-sizing: border-box;
         }
 
         .search-box {
             display: flex;
             background: #242424;
             border-radius: 50px;
-            padding: 8px 15px;
+            padding: 10px 15px;
             align-items: center;
             border: 1px solid transparent;
         }
@@ -79,17 +78,19 @@
         .result-item {
             display: flex;
             align-items: center;
-            padding: 8px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             cursor: pointer;
-            gap: 10px;
+            gap: 12px;
+            margin-bottom: 5px;
+            transition: background 0.2s;
         }
         .result-item:hover {
             background-color: #2a2a2a;
         }
         .result-item img {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border-radius: 4px;
             object-fit: cover;
         }
@@ -98,13 +99,12 @@
             white-space: nowrap;
             text-overflow: ellipsis;
         }
-        .result-item .title { font-size: 14px; font-weight: bold; }
+        .result-item .title { font-size: 14px; font-weight: bold; color: #fff; }
         .result-item .author { font-size: 12px; color: var(--text-muted); }
 
-        /* Área de Letras Central */
         .main-content {
             flex: 1;
-            background: linear-gradient(to bottom, #222522, #121212);
+            background: linear-gradient(to bottom, #1c281f, #121212);
             margin: 8px;
             border-radius: 8px;
             display: flex;
@@ -114,26 +114,28 @@
             position: relative;
         }
 
-        /* Ajustes Estilo Musicolet para Letras */
         .lyrics-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
             border-bottom: 1px solid #282828;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
         }
         .lyrics-toggle-btn {
             background: #282828;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
         }
         .lyrics-toggle-btn.active {
             background: var(--spotify-green);
+            color: black;
         }
 
         .lyrics-body {
@@ -141,41 +143,41 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            line-height: 1.6;
-            transition: all 0.3s ease;
+            padding: 20px 0;
         }
 
-        /* Letras Sincronizadas (Estilo LRC) */
+        .lyrics-scroll-container {
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+        }
+
         .lrc-line {
             opacity: 0.3;
             transform: scale(0.9);
-            transition: all 0.25s ease;
-            margin: 10px 0;
+            transition: all 0.3s ease;
+            margin: 20px 0;
             cursor: pointer;
+            font-size: 26px;
+            font-weight: 700;
         }
         .lrc-line.active {
             opacity: 1;
             color: var(--spotify-green);
-            transform: scale(1.08);
+            transform: scale(1.05);
         }
 
-        /* Letras en modo Texto Puro */
         .plain-text-lyrics {
             font-size: 18px;
-            font-weight: normal;
+            font-weight: 400;
             white-space: pre-line;
             color: var(--text-muted);
             text-align: left;
             width: 100%;
             max-width: 600px;
-            overflow-y: auto;
+            line-height: 1.8;
         }
 
-        /* Reproductor Inferior Fijo */
         .player-bar {
             height: 90px;
             background-color: var(--bg-player);
@@ -193,8 +195,9 @@
             width: 30%;
             gap: 15px;
         }
-        #current-thumb { width: 56px; height: 56px; border-radius: 4px; background: #282828; }
-        .track-details .title { font-size: 14px; font-weight: 500; }
+        #current-thumb { width: 56px; height: 56px; border-radius: 4px; background: #282828; object-fit: cover; }
+        .track-details { overflow: hidden; }
+        .track-details .title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .track-details .artist { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
         .player-controls {
@@ -214,17 +217,20 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .control-buttons button:hover { color: #fff; }
         .control-buttons .play-btn {
             background: #fff;
             color: #000;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        .control-buttons .play-btn:hover {
+            transform: scale(1.05);
         }
 
         .progress-container {
@@ -253,12 +259,13 @@
             background: var(--spotify-green);
         }
 
-        /* Ocultar el iframe de YouTube de forma segura */
         #yt-hidden-player {
             position: absolute;
-            width: 1px;
-            height: 1px;
-            opacity: 0;
+            bottom: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            opacity: 0.01; /* Evita que el navegador detenga la carga por estar oculto del todo */
             pointer-events: none;
         }
     </style>
@@ -266,21 +273,17 @@
 <body>
 
     <div class="app-container">
-        <!-- Barra Lateral Izquierda -->
         <div class="sidebar">
             <div class="search-box">
-                <span class="material-symbols-rounded">search</span>
-                <input type="text" id="search-input" placeholder="Buscar canciones en YouTube...">
+                <span class="material-symbols-rounded" style="color: var(--text-muted)">search</span>
+                <input type="text" id="search-input" placeholder="Buscar música y presionar Enter...">
             </div>
-            <ul class="results-list" id="results-list">
-                <!-- Los resultados de búsqueda aparecerán aquí -->
-            </ul>
+            <ul class="results-list" id="results-list"></ul>
         </div>
 
-        <!-- Contenedor de Letras (Principal) -->
         <div class="main-content">
             <div class="lyrics-header">
-                <div id="playing-title-top" style="font-weight: bold;">Ninguna canción en reproducción</div>
+                <div id="playing-title-top" style="font-weight: bold; font-size: 18px;">Ninguna canción en reproducción</div>
                 <div>
                     <button class="lyrics-toggle-btn active" id="btn-sync" onclick="setLyricsMode('sync')">Sincronizada (LRC)</button>
                     <button class="lyrics-toggle-btn" id="btn-plain" onclick="setLyricsMode('plain')">Texto Plano</button>
@@ -288,12 +291,11 @@
             </div>
             
             <div class="lyrics-body" id="lyrics-display">
-                <div style="color: var(--text-muted); font-size: 16px;">Busca una canción y selecciónala para cargar su audio y letras simuladas.</div>
+                <div style="color: var(--text-muted); font-size: 16px; margin-top: 40px;">Busca una canción en el panel izquierdo y selecciónala para iniciar.</div>
             </div>
         </div>
     </div>
 
-    <!-- Barra de Reproducción Inferior -->
     <div class="player-bar">
         <div class="track-info">
             <img id="current-thumb" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
@@ -314,4 +316,3 @@
                 <button class="material-symbols-rounded">repeat</button>
             </div>
             <div class="progress-container">
-                <span id="time-current">0:00</span>
