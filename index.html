@@ -68,6 +68,18 @@
             font-size: 14px;
         }
 
+        /* Botón de búsqueda explícito para pantallas táctiles */
+        .btn-search-trigger {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        .btn-search-trigger:hover { color: #fff; }
+
         .results-list {
             flex: 1;
             overflow-y: auto;
@@ -229,9 +241,6 @@
             width: 36px;
             height: 36px;
         }
-        .control-buttons .play-btn:hover {
-            transform: scale(1.05);
-        }
 
         .progress-container {
             display: flex;
@@ -255,17 +264,14 @@
             width: 0%;
             border-radius: 2px;
         }
-        .progress-bar:hover .progress-fill {
-            background: var(--spotify-green);
-        }
 
         #yt-hidden-player {
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 200px;
-            height: 200px;
-            opacity: 0.01; /* Evita que el navegador detenga la carga por estar oculto del todo */
+            width: 1px;
+            height: 1px;
+            opacity: 0;
             pointer-events: none;
         }
     </style>
@@ -275,8 +281,11 @@
     <div class="app-container">
         <div class="sidebar">
             <div class="search-box">
-                <span class="material-symbols-rounded" style="color: var(--text-muted)">search</span>
-                <input type="text" id="search-input" placeholder="Buscar música y presionar Enter...">
+                <!-- Convertido en botón interactivo real -->
+                <button class="btn-search-trigger" onclick="executeSearch()">
+                    <span class="material-symbols-rounded">search</span>
+                </button>
+                <input type="text" id="search-input" placeholder="Escribe y presiona Enter o la Lupa...">
             </div>
             <ul class="results-list" id="results-list"></ul>
         </div>
@@ -312,7 +321,3 @@
                 <button class="play-btn" onclick="togglePlay()">
                     <span class="material-symbols-rounded" id="play-icon">play_arrow</span>
                 </button>
-                <button class="material-symbols-rounded">skip_next</button>
-                <button class="material-symbols-rounded">repeat</button>
-            </div>
-            <div class="progress-container">
