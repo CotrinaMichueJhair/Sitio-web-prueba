@@ -1,323 +1,421 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Clone + Musicolet Lyrics</title>
-    <!-- Iconos oficiales de Google Fonts -->
-    <link rel="stylesheet" href="https://googleapis.com" />
-    <style>
-        :root {
-            --bg-main: #000000;
-            --bg-sidebar: #121212;
-            --bg-player: #181818;
-            --spotify-green: #1db954;
-            --text-main: #ffffff;
-            --text-muted: #b3b3b3;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        .app-container {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 90px);
-            overflow: hidden;
-        }
-
-        .sidebar {
-            width: 320px;
-            background-color: var(--bg-sidebar);
-            margin: 8px 0 8px 8px;
-            border-radius: 8px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-sizing: border-box;
-        }
-
-        .search-box {
-            display: flex;
-            background: #242424;
-            border-radius: 50px;
-            padding: 10px 15px;
-            align-items: center;
-            border: 1px solid transparent;
-        }
-        .search-box:focus-within {
-            border-color: #fff;
-        }
-        .search-box input {
-            background: none;
-            border: none;
-            color: #fff;
-            outline: none;
-            width: 100%;
-            margin-left: 10px;
-            font-size: 14px;
-        }
-
-        /* Botón de búsqueda explícito para pantallas táctiles */
-        .btn-search-trigger {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-        }
-        .btn-search-trigger:hover { color: #fff; }
-
-        .results-list {
-            flex: 1;
-            overflow-y: auto;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .result-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            gap: 12px;
-            margin-bottom: 5px;
-            transition: background 0.2s;
-        }
-        .result-item:hover {
-            background-color: #2a2a2a;
-        }
-        .result-item img {
-            width: 48px;
-            height: 48px;
-            border-radius: 4px;
-            object-fit: cover;
-        }
-        .result-item .info {
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        .result-item .title { font-size: 14px; font-weight: bold; color: #fff; }
-        .result-item .author { font-size: 12px; color: var(--text-muted); }
-
-        .main-content {
-            flex: 1;
-            background: linear-gradient(to bottom, #1c281f, #121212);
-            margin: 8px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            padding: 30px;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .lyrics-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #282828;
-            padding-bottom: 15px;
-        }
-        .lyrics-toggle-btn {
-            background: #282828;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-        .lyrics-toggle-btn.active {
-            background: var(--spotify-green);
-            color: black;
-        }
-
-        .lyrics-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 0;
-        }
-
-        .lyrics-scroll-container {
-            width: 100%;
-            max-width: 650px;
-            text-align: center;
-        }
-
-        .lrc-line {
-            opacity: 0.3;
-            transform: scale(0.9);
-            transition: all 0.3s ease;
-            margin: 20px 0;
-            cursor: pointer;
-            font-size: 26px;
-            font-weight: 700;
-        }
-        .lrc-line.active {
-            opacity: 1;
-            color: var(--spotify-green);
-            transform: scale(1.05);
-        }
-
-        .plain-text-lyrics {
-            font-size: 18px;
-            font-weight: 400;
-            white-space: pre-line;
-            color: var(--text-muted);
-            text-align: left;
-            width: 100%;
-            max-width: 600px;
-            line-height: 1.8;
-        }
-
-        .player-bar {
-            height: 90px;
-            background-color: var(--bg-player);
-            border-top: 1px solid #282828;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-
-        .track-info {
-            display: flex;
-            align-items: center;
-            width: 30%;
-            gap: 15px;
-        }
-        #current-thumb { width: 56px; height: 56px; border-radius: 4px; background: #282828; object-fit: cover; }
-        .track-details { overflow: hidden; }
-        .track-details .title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-details .artist { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-
-        .player-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 40%;
-            gap: 8px;
-        }
-        .control-buttons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .control-buttons button {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .control-buttons button:hover { color: #fff; }
-        .control-buttons .play-btn {
-            background: #fff;
-            color: #000;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-        }
-
-        .progress-container {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            gap: 10px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: #4f4f4f;
-            border-radius: 2px;
-            position: relative;
-            cursor: pointer;
-        }
-        .progress-fill {
-            height: 100%;
-            background: #fff;
-            width: 0%;
-            border-radius: 2px;
-        }
-
-        #yt-hidden-player {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 1px;
-            height: 1px;
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b14">
+  <title>SONARA — Tu música, tus letras</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b14; --panel:#101522; --panel2:#171e2d; --line:#252e40;
+      --red:#ff3b55; --red2:#d91f40; --blue:#4388ff; --white:#f6f7fb;
+      --muted:#8e98aa; --green:#38d996;
+    }
+    * { box-sizing:border-box }
+    body { margin:0; min-height:100vh; color:var(--white); background:var(--bg); font-family:"DM Sans",sans-serif; overflow:hidden }
+    button,input,textarea { font:inherit }
+    button { cursor:pointer }
+    .app { height:100vh; display:grid; grid-template-columns:310px minmax(0,1fr); grid-template-rows:minmax(0,1fr) 96px; gap:10px; padding:10px }
+    .sidebar,.main,.player { background:var(--panel); border:1px solid var(--line); border-radius:18px }
+    .sidebar { padding:20px 14px; display:flex; flex-direction:column; min-height:0; gap:18px }
+    .brand { display:flex; align-items:center; gap:11px; padding:0 7px 8px }
+    .brand-icon { width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#438cff,#2454d9);box-shadow:0 8px 24px #2454d944;font-size:24px }
+    .brand-name { font-size:21px;font-weight:800;letter-spacing:1.5px }
+    .brand-name span { color:var(--red) }
+    .section-label { color:var(--muted);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;padding:0 9px }
+    .search { display:flex;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:7px }
+    .search input { min-width:0;width:100%;border:0;outline:0;background:transparent;color:white;padding:7px;font-size:13px }
+    .icon-btn,.primary-btn,.soft-btn { border:0;border-radius:10px;color:white;padding:9px 12px;background:var(--red);font-weight:700 }
+    .icon-btn { width:39px;flex:none;font-size:18px }
+    .soft-btn { background:var(--panel2);border:1px solid var(--line);font-size:12px }
+    .primary-btn:hover,.icon-btn:hover { background:var(--red2) }
+    .side-actions { display:flex;gap:8px }
+    .side-actions button { flex:1 }
+    .results { list-style:none;margin:0;padding:0;overflow:auto;min-height:100px }
+    .result { display:flex;align-items:center;gap:10px;padding:9px;border-radius:11px;cursor:pointer }
+    .result:hover { background:var(--panel2) }
+    .result img { width:49px;height:49px;object-fit:cover;border-radius:8px;background:#252c3a }
+    .result-info { min-width:0 }
+    .result-title { font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
+    .result-sub { color:var(--muted);font-size:11px;margin-top:4px }
+    .hint { color:var(--muted);font-size:11px;line-height:1.6;padding:0 9px }
+    .main { min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 50% -20%,#38202e 0%,#151827 43%,#101522 78%) }
+    .topbar { display:flex;justify-content:space-between;align-items:center;padding:20px 25px;border-bottom:1px solid #ffffff0d;gap:12px }
+    .eyebrow { color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase }
+    h1 { font-size:clamp(19px,2.4vw,27px);margin:5px 0 0 }
+    .top-actions { display:flex;gap:8px;flex-wrap:wrap }
+    .workspace { display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;padding:22px 25px;min-height:0;flex:1;overflow:auto }
+    .lyrics-panel { min-width:0;display:flex;flex-direction:column;align-items:center }
+    .lyrics-heading { width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px }
+    .mode-switch { display:flex;gap:5px;background:#090d17aa;padding:4px;border:1px solid var(--line);border-radius:12px }
+    .mode-switch button { border:0;background:transparent;color:var(--muted);padding:8px 11px;border-radius:8px;font-size:11px;font-weight:700 }
+    .mode-switch button.active { color:white;background:var(--red) }
+    .lyrics-scroll { width:100%;max-width:720px;min-height:250px;overflow:auto;text-align:center;padding:40px 12px;scroll-behavior:smooth }
+    .lyric-line { color:#7c8495;font-size:clamp(18px,2.2vw,27px);font-weight:800;line-height:1.45;margin:19px 0;cursor:pointer;transition:.2s }
+    .lyric-line.active { color:white;text-shadow:0 0 22px #ff3b5570;transform:scale(1.025) }
+    .plain-lyrics { width:100%;max-width:680px;min-height:260px;resize:vertical;background:#090d1780;border:1px solid var(--line);border-radius:14px;color:#e8eaf1;padding:18px;line-height:1.9;outline:none }
+    .empty { color:var(--muted);max-width:450px;line-height:1.8;margin:auto;padding:50px 15px;text-align:center }
+    .editor { background:#0b101caa;border:1px solid var(--line);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0 }
+    .editor h2 { margin:0;font-size:14px }
+    .editor p { color:var(--muted);font-size:11px;line-height:1.6;margin:0 }
+    .editor textarea,.editor input { width:100%;background:#151d2b;border:1px solid var(--line);border-radius:9px;color:white;padding:10px;outline:none;font-size:12px }
+    .editor textarea { min-height:145px;resize:vertical;line-height:1.6 }
+    .editor textarea:focus,.editor input:focus { border-color:var(--red) }
+    .editor-row { display:flex;gap:7px;flex-wrap:wrap }
+    .editor-row button { flex:1;min-width:90px }
+    .player { grid-column:1/-1;display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.4fr) minmax(130px,1fr);align-items:center;padding:12px 20px;gap:15px }
+    .now-playing { display:flex;align-items:center;gap:12px;min-width:0 }
+    .cover { width:58px;height:58px;border-radius:10px;object-fit:cover;background:#242b3a }
+    .song-meta { min-width:0 }
+    .song-meta strong,.song-meta span { display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
+    .song-meta strong { font-size:13px }
+    .song-meta span { color:var(--muted);font-size:11px;margin-top:5px }
+    .controls { display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0 }
+    .control-buttons { display:flex;align-items:center;gap:17px }
+    .control-buttons button { border:0;background:none;color:#c5cad5;font-size:18px }
+    .control-buttons .play { width:37px;height:37px;border-radius:50%;background:white;color:#111;font-size:18px }
+    .progress { width:100%;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:10px }
+    input[type=range] { accent-color:var(--red);width:100%;cursor:pointer }
+    .volume { display:flex;align-items:center;justify-content:flex-end;gap:8px;color:var(--muted);font-size:13px }
+    .volume input { max-width:110px }
+    #youtube-player { position:fixed;width:1px;height:1px;left:-20px;bottom:-20px;opacity:.01;pointer-events:none }
+    .toast { position:fixed;bottom:115px;left:50%;transform:translateX(-50%);background:#202a3b;border:1px solid var(--line);padding:10px 15px;border-radius:10px;font-size:12px;display:none;z-index:5 }
+    @media(max-width:900px) {
+      .app { grid-template-columns:250px minmax(0,1fr) }
+      .workspace { grid-template-columns:1fr }
+      .editor { order:2 }
+      .lyrics-scroll { min-height:200px }
+    }
+    @media(max-width:650px) {
+      body { overflow:auto }
+      .app { height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto minmax(520px,1fr) auto;padding:7px;gap:7px }
+      .sidebar { min-height:260px;max-height:350px }
+      .main { min-height:650px }
+      .topbar { padding:16px }
+      .workspace { padding:15px;gap:14px }
+      .player { position:sticky;bottom:0;grid-column:1;grid-template-columns:1fr;gap:10px;padding:12px;background:#151b29;z-index:3 }
+      .now-playing { justify-content:center }
+      .volume { display:none }
+    }
+  </style>
 </head>
 <body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-icon">♫</div><div class="brand-name">SONA<span>RA</span></div></div>
+      <div class="section-label">Buscar música en YouTube</div>
+      <form class="search" id="search-form">
+        <input id="search-input" placeholder="Canción, artista o álbum..." autocomplete="off">
+        <button class="icon-btn" type="submit" aria-label="Buscar">⌕</button>
+      </form>
+      <div class="side-actions">
+        <button class="soft-btn" id="api-settings">Configurar API</button>
+        <button class="soft-btn" id="clear-results">Limpiar</button>
+      </div>
+      <div class="section-label">Resultados</div>
+      <ul class="results" id="results"><li class="hint">Busca una canción para ver los resultados aquí.</li></ul>
+      <p class="hint">La reproducción se realiza mediante el reproductor oficial incrustado de YouTube. No descarga audio ni elimina anuncios.</p>
+    </aside>
 
-    <div class="app-container">
-        <div class="sidebar">
-            <div class="search-box">
-                <!-- Convertido en botón interactivo real -->
-                <button class="btn-search-trigger" onclick="executeSearch()">
-                    <span class="material-symbols-rounded">search</span>
-                </button>
-                <input type="text" id="search-input" placeholder="Escribe y presiona Enter o la Lupa...">
+    <main class="main">
+      <header class="topbar">
+        <div><div class="eyebrow">Tu música · Tu estilo</div><h1 id="top-title">Tu espacio musical</h1></div>
+        <div class="top-actions"><button class="soft-btn" id="save-lyrics">Guardar letras</button><button class="soft-btn" id="load-lyrics">Cargar letras</button></div>
+      </header>
+      <section class="workspace">
+        <div class="lyrics-panel">
+          <div class="lyrics-heading">
+            <span class="section-label">Letras de la canción</span>
+            <div class="mode-switch">
+              <button id="sync-mode" class="active">Sincronizadas</button>
+              <button id="plain-mode">Texto plano</button>
             </div>
-            <ul class="results-list" id="results-list"></ul>
+          </div>
+          <div class="lyrics-scroll" id="lyrics-view">
+            <div class="empty">♫<br><br>Busca y reproduce una canción.<br>Después podrás escribir tus letras y sincronizarlas línea por línea.</div>
+          </div>
         </div>
+        <aside class="editor">
+          <h2>Editor de letras</h2>
+          <p>Escribe una letra por línea. En modo sincronizado, reproduce la canción y pulsa «Marcar línea» para asignar el tiempo actual.</p>
+          <input id="lyrics-title" placeholder="Nombre de la canción">
+          <textarea id="lyrics-input" spellcheck="false" placeholder="Escribe o pega aquí las letras...&#10;Cada línea será una línea de la canción."></textarea>
+          <div class="editor-row">
+            <button class="primary-btn" id="mark-line">● Marcar línea</button>
+            <button class="soft-btn" id="add-time">+ Tiempo manual</button>
+          </div>
+          <div class="editor-row">
+            <button class="soft-btn" id="render-lyrics">Aplicar letras</button>
+            <button class="soft-btn" id="clear-lyrics">Borrar</button>
+          </div>
+          <p>Formato LRC: <b>[mm:ss.xx]Texto de la línea</b>. También puedes pegar un LRC completo. Pulsa una línea sincronizada para saltar a ese momento.</p>
+          <input id="manual-time" placeholder="Tiempo manual (ej. 01:24.50)">
+          <div class="editor-row"><button class="soft-btn" id="import-lrc">Importar LRC</button><button class="soft-btn" id="export-lrc">Exportar LRC</button></div>
+          <p id="editor-status">Los cambios se guardan en este navegador cuando pulses «Guardar letras».</p>
+        </aside>
+      </section>
+    </main>
 
-        <div class="main-content">
-            <div class="lyrics-header">
-                <div id="playing-title-top" style="font-weight: bold; font-size: 18px;">Ninguna canción en reproducción</div>
-                <div>
-                    <button class="lyrics-toggle-btn active" id="btn-sync" onclick="setLyricsMode('sync')">Sincronizada (LRC)</button>
-                    <button class="lyrics-toggle-btn" id="btn-plain" onclick="setLyricsMode('plain')">Texto Plano</button>
-                </div>
-            </div>
-            
-            <div class="lyrics-body" id="lyrics-display">
-                <div style="color: var(--text-muted); font-size: 16px; margin-top: 40px;">Busca una canción en el panel izquierdo y selecciónala para iniciar.</div>
-            </div>
+    <footer class="player">
+      <div class="now-playing">
+        <img class="cover" id="cover" src="https://placehold.co/120x120/202a3b/ffffff?text=♫" alt="Portada">
+        <div class="song-meta"><strong id="song-title">Ninguna canción seleccionada</strong><span id="song-artist">SONARA Player</span></div>
+      </div>
+      <div class="controls">
+        <div class="control-buttons">
+          <button id="previous" title="Anterior">⏮</button>
+          <button class="play" id="play" title="Reproducir o pausar">▶</button>
+          <button id="next" title="Siguiente">⏭</button>
         </div>
-    </div>
+        <div class="progress"><span id="current-time">0:00</span><input id="seek" type="range" min="0" max="100" value="0"><span id="duration">0:00</span></div>
+      </div>
+      <div class="volume">🔊 <input id="volume" type="range" min="0" max="100" value="75"></div>
+    </footer>
+  </div>
+  <div id="youtube-player"></div>
+  <div class="toast" id="toast"></div>
 
-    <div class="player-bar">
-        <div class="track-info">
-            <img id="current-thumb" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
-            <div class="track-details">
-                <div class="title" id="player-title">Título de la canción</div>
-                <div class="artist" id="player-artist">Artista / Canal</div>
-            </div>
-        </div>
+  <script>
+    // SONARA: búsqueda mediante YouTube Data API v3 (requiere una API key propia).
+    const $ = (id) => document.getElementById(id);
+    const state = { apiKey: localStorage.getItem('sonara_api_key') || '', player: null, ready: false,
+      results: [], index: -1, mode: 'sync', lyrics: [], timer: null, activeLine: -1, duration: 0 };
+    const LRC_RE = /^\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\](.*)$/;
 
-        <div class="player-controls">
-            <div class="control-buttons">
-                <button class="material-symbols-rounded">shuffle</button>
-                <button class="material-symbols-rounded">skip_previous</button>
-                <button class="play-btn" onclick="togglePlay()">
-                    <span class="material-symbols-rounded" id="play-icon">play_arrow</span>
-                </button>
+    function toast(message) {
+      const el = $('toast'); el.textContent = message; el.style.display = 'block';
+      clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => el.style.display = 'none', 2600);
+    }
+    function formatTime(seconds) {
+      seconds = Math.max(0, Number(seconds) || 0);
+      return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2,'0')}`;
+    }
+    function parseTime(value) {
+      const m = String(value).trim().match(/^(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?$/);
+      if (!m) return null;
+      const fraction = m[3] ? Number('0.' + m[3]) : 0;
+      return Number(m[1]) * 60 + Number(m[2]) + fraction;
+    }
+    function parseLRC(text) {
+      const lines = [];
+      text.split(/\r?\n/).forEach(raw => {
+        const match = raw.match(LRC_RE);
+        if (!match) return;
+        const fraction = match[3] ? Number('0.' + match[3]) : 0;
+        lines.push({ time: Number(match[1]) * 60 + Number(match[2]) + fraction, text: match[4].trim() });
+      });
+      return lines.sort((a,b) => a.time - b.time);
+    }
+    function toLRC(lines) {
+      return lines.map(line => {
+        const centiseconds = Math.floor((line.time % 1) * 100);
+        const total = Math.floor(line.time);
+        return `[${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}.${String(centiseconds).padStart(2,'0')}]${line.text}`;
+      }).join('\n');
+    }
+
+    // YouTube IFrame Player API
+    const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+    window.onYouTubeIframeAPIReady = function() {
+      state.player = new YT.Player('youtube-player', {
+        width:'1', height:'1', videoId:'',
+        playerVars:{playsinline:1,controls:0,rel:0},
+        events:{
+          onReady:() => { state.ready = true; $('volume').value = 75; state.player.setVolume(75); },
+          onStateChange:(event) => {
+            if (event.data === YT.PlayerState.PLAYING) $('play').textContent = 'Ⅱ';
+            else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) $('play').textContent = '▶';
+            if (event.data === YT.PlayerState.ENDED) playIndex(state.index + 1);
+          },
+          onError:() => toast('YouTube no pudo reproducir este video. Prueba otro resultado.')
+        }
+      });
+    };
+
+    async function searchYouTube(query) {
+      if (!state.apiKey) {
+        toast('Primero configura tu clave de YouTube Data API.');
+        $('api-settings').click(); return;
+      }
+      $('results').innerHTML = '<li class="hint">Buscando...</li>';
+      try {
+        const url = new URL('https://www.googleapis.com/youtube/v3/search');
+        url.search = new URLSearchParams({part:'snippet',q:query,type:'video',videoCategoryId:'10',maxResults:'15',key:state.apiKey});
+        const response = await fetch(url);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error?.message || 'No se pudo realizar la búsqueda.');
+        state.results = (data.items || []).filter(item => item.id?.videoId);
+        renderResults();
+        if (!state.results.length) $('results').innerHTML = '<li class="hint">No se encontraron canciones.</li>';
+      } catch (error) {
+        $('results').innerHTML = `<li class="hint">${escapeHTML(error.message)}</li>`;
+      }
+    }
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    }
+    function renderResults() {
+      $('results').innerHTML = '';
+      state.results.forEach((item,index) => {
+        const snippet = item.snippet;
+        const li = document.createElement('li'); li.className = 'result';
+        li.innerHTML = `<img src="${escapeHTML(snippet.thumbnails?.default?.url || '')}" alt=""><div class="result-info"><div class="result-title">${escapeHTML(snippet.title)}</div><div class="result-sub">${escapeHTML(snippet.channelTitle)}</div></div>`;
+        li.addEventListener('click', () => playIndex(index));
+        $('results').appendChild(li);
+      });
+    }
+    function playIndex(index) {
+      if (!state.results.length) return;
+      if (index < 0) index = state.results.length - 1;
+      if (index >= state.results.length) index = 0;
+      state.index = index;
+      const item = state.results[index], s = item.snippet;
+      $('song-title').textContent = s.title;
+      $('song-artist').textContent = s.channelTitle;
+      $('top-title').textContent = s.title;
+      $('cover').src = s.thumbnails?.medium?.url || s.thumbnails?.default?.url || '';
+      if (state.player && state.ready) state.player.loadVideoById(item.id.videoId);
+      else toast('El reproductor todavía está cargando. Inténtalo de nuevo en unos segundos.');
+      $('lyrics-title').value = s.title;
+      $('play').textContent = 'Ⅱ';
+    }
+    function togglePlay() {
+      if (!state.player || !state.ready) return toast('El reproductor todavía está cargando.');
+      const status = state.player.getPlayerState();
+      if (status === YT.PlayerState.PLAYING) state.player.pauseVideo();
+      else if (state.index >= 0) state.player.playVideo();
+      else toast('Primero selecciona una canción.');
+    }
+    function currentTime() {
+      return state.player && state.ready ? state.player.getCurrentTime() || 0 : 0;
+    }
+    function addCurrentLine() {
+      const text = $('lyrics-input').value.split(/\r?\n/).filter(line => line.trim());
+      const already = state.lyrics.map(line => line.text);
+      const next = text.find(line => !already.includes(line.trim()));
+      if (!next) return toast('Escribe una línea nueva en el editor antes de marcarla.');
+      state.lyrics.push({time:currentTime(),text:next.trim()});
+      state.lyrics.sort((a,b) => a.time-b.time);
+      renderLyrics(); $('editor-status').textContent = `Línea marcada en ${formatTime(currentTime())}.`;
+    }
+    function renderLyrics() {
+      const view = $('lyrics-view'); view.innerHTML = '';
+      if (state.mode === 'plain') {
+        const area = document.createElement('textarea'); area.className = 'plain-lyrics';
+        area.value = $('lyrics-input').value; area.placeholder = 'Tus letras aparecerán aquí...';
+        area.addEventListener('input', () => $('lyrics-input').value = area.value);
+        view.appendChild(area); return;
+      }
+      if (!state.lyrics.length) {
+        view.innerHTML = '<div class="empty">Todavía no hay letras sincronizadas.<br>Escribe o pega las letras y marca cada línea mientras escuchas.</div>'; return;
+      }
+      state.lyrics.forEach((line,index) => {
+        const div = document.createElement('div'); div.className = 'lyric-line' + (index === state.activeLine ? ' active' : '');
+        div.textContent = line.text; div.title = formatTime(line.time);
+        div.addEventListener('click', () => { if (state.player && state.ready) state.player.seekTo(line.time,true); });
+        view.appendChild(div);
+      });
+      const active = view.querySelector('.lyric-line.active');
+      if (active) active.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    function updateLyrics() {
+      if (state.mode !== 'sync' || !state.lyrics.length) return;
+      const time = currentTime();
+      let active = -1;
+      for (let i=0;i<state.lyrics.length;i++) if (state.lyrics[i].time <= time) active = i; else break;
+      if (active !== state.activeLine) { state.activeLine = active; renderLyrics(); }
+    }
+    function setMode(mode) {
+      state.mode = mode;
+      $('sync-mode').classList.toggle('active',mode==='sync');
+      $('plain-mode').classList.toggle('active',mode==='plain');
+      renderLyrics();
+    }
+    function saveLyrics() {
+      const title = $('lyrics-title').value.trim() || $('song-title').textContent;
+      const payload = {title,plain:$('lyrics-input').value,lines:state.lyrics};
+      localStorage.setItem('sonara_lyrics_' + title.toLowerCase(),JSON.stringify(payload));
+      toast('Letras guardadas en este navegador.');
+    }
+    function loadLyrics() {
+      const title = $('lyrics-title').value.trim() || $('song-title').textContent;
+      const raw = localStorage.getItem('sonara_lyrics_' + title.toLowerCase());
+      if (!raw) return toast('No hay letras guardadas con ese título.');
+      const data = JSON.parse(raw);
+      $('lyrics-input').value = data.plain || '';
+      state.lyrics = data.lines || [];
+      renderLyrics(); toast('Letras cargadas.');
+    }
+
+    $('search-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const query = $('search-input').value.trim();
+      if (query) searchYouTube(query);
+    });
+    $('api-settings').addEventListener('click', () => {
+      const key = prompt('Pega tu clave de YouTube Data API v3:',state.apiKey);
+      if (key === null) return;
+      state.apiKey = key.trim(); localStorage.setItem('sonara_api_key',state.apiKey);
+      toast(state.apiKey ? 'Clave guardada en este navegador.' : 'Clave eliminada.');
+    });
+    $('clear-results').addEventListener('click',() => { state.results=[]; $('results').innerHTML='<li class="hint">Resultados limpiados.</li>'; });
+    $('play').addEventListener('click',togglePlay);
+    $('previous').addEventListener('click',() => playIndex(state.index-1));
+    $('next').addEventListener('click',() => playIndex(state.index+1));
+    $('volume').addEventListener('input',event => { if(state.player && state.ready) state.player.setVolume(Number(event.target.value)); });
+    $('seek').addEventListener('input',event => {
+      if(state.player && state.ready && state.duration) state.player.seekTo(Number(event.target.value)/100*state.duration,true);
+    });
+    $('sync-mode').addEventListener('click',() => setMode('sync'));
+    $('plain-mode').addEventListener('click',() => setMode('plain'));
+    $('mark-line').addEventListener('click',addCurrentLine);
+    $('add-time').addEventListener('click',() => {
+      const time = parseTime($('manual-time').value);
+      const line = prompt('Texto de la línea para ese tiempo:');
+      if(time === null) return toast('Escribe un tiempo válido, por ejemplo 01:24.50.');
+      if(!line?.trim()) return;
+      state.lyrics.push({time,text:line.trim()}); state.lyrics.sort((a,b)=>a.time-b.time); renderLyrics();
+    });
+    $('render-lyrics').addEventListener('click',() => {
+      const raw = $('lyrics-input').value;
+      const parsed = parseLRC(raw);
+      if (parsed.length) state.lyrics = parsed;
+      else state.lyrics = [];
+      state.activeLine=-1; renderLyrics();
+      $('editor-status').textContent = parsed.length ? `${parsed.length} líneas LRC importadas.` : 'Texto aplicado. Marca los tiempos para sincronizarlo.';
+      toast(parsed.length ? 'Letras LRC aplicadas.' : 'Texto aplicado.');
+    });
+    $('clear-lyrics').addEventListener('click',() => {
+      $('lyrics-input').value=''; state.lyrics=[]; state.activeLine=-1; renderLyrics();
+    });
+    $('import-lrc').addEventListener('click',() => {
+      const parsed=parseLRC($('lyrics-input').value);
+      if(!parsed.length) return toast('No se detectaron marcas de tiempo LRC.');
+      state.lyrics=parsed; state.activeLine=-1; renderLyrics(); toast('LRC importado.');
+    });
+    $('export-lrc').addEventListener('click',() => {
+      if(!state.lyrics.length) return toast('No hay líneas sincronizadas para exportar.');
+      const blob=new Blob([toLRC(state.lyrics)],{type:'text/plain;charset=utf-8'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download=(($('lyrics-title').value||'letras').replace(/[^\w\-]+/g,'_'))+'.lrc'; a.click(); URL.revokeObjectURL(a.href);
+    });
+    $('save-lyrics').addEventListener('click',saveLyrics);
+    $('load-lyrics').addEventListener('click',loadLyrics);
+    setInterval(() => {
+      if(!state.player || !state.ready) return;
+      try {
+        state.duration=state.player.getDuration() || 0;
+        const time=currentTime();
+        $('current-time').textContent=formatTime(time);
+        $('duration').textContent=formatTime(state.duration);
+        $('seek').value=state.duration ? time/state.duration*100 : 0;
+        updateLyrics();
+      } catch (_) {}
+    },250);
+  </script>
+</body>
+</html>
