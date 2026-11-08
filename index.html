@@ -9,96 +9,97 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#080b14; --panel:#101522; --panel2:#171e2d; --line:#252e40;
-      --red:#ff3b55; --red2:#d91f40; --blue:#4388ff; --white:#f6f7fb;
-      --muted:#8e98aa; --green:#38d996;
-    }
-    * { box-sizing:border-box }
-    body { margin:0; min-height:100vh; color:var(--white); background:var(--bg); font-family:"DM Sans",sans-serif; overflow:hidden }
-    button,input,textarea { font:inherit }
-    button { cursor:pointer }
-    .app { height:100vh; display:grid; grid-template-columns:310px minmax(0,1fr); grid-template-rows:minmax(0,1fr) 96px; gap:10px; padding:10px }
-    .sidebar,.main,.player { background:var(--panel); border:1px solid var(--line); border-radius:18px }
-    .sidebar { padding:20px 14px; display:flex; flex-direction:column; min-height:0; gap:18px }
-    .brand { display:flex; align-items:center; gap:11px; padding:0 7px 8px }
-    .brand-icon { width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#438cff,#2454d9);box-shadow:0 8px 24px #2454d944;font-size:24px }
-    .brand-name { font-size:21px;font-weight:800;letter-spacing:1.5px }
-    .brand-name span { color:var(--red) }
-    .section-label { color:var(--muted);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;padding:0 9px }
-    .search { display:flex;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:7px }
-    .search input { min-width:0;width:100%;border:0;outline:0;background:transparent;color:white;padding:7px;font-size:13px }
-    .icon-btn,.primary-btn,.soft-btn { border:0;border-radius:10px;color:white;padding:9px 12px;background:var(--red);font-weight:700 }
-    .icon-btn { width:39px;flex:none;font-size:18px }
-    .soft-btn { background:var(--panel2);border:1px solid var(--line);font-size:12px }
-    .primary-btn:hover,.icon-btn:hover { background:var(--red2) }
-    .side-actions { display:flex;gap:8px }
-    .side-actions button { flex:1 }
-    .results { list-style:none;margin:0;padding:0;overflow:auto;min-height:100px }
-    .result { display:flex;align-items:center;gap:10px;padding:9px;border-radius:11px;cursor:pointer }
-    .result:hover { background:var(--panel2) }
-    .result img { width:49px;height:49px;object-fit:cover;border-radius:8px;background:#252c3a }
-    .result-info { min-width:0 }
-    .result-title { font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-    .result-sub { color:var(--muted);font-size:11px;margin-top:4px }
-    .hint { color:var(--muted);font-size:11px;line-height:1.6;padding:0 9px }
-    .main { min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 50% -20%,#38202e 0%,#151827 43%,#101522 78%) }
-    .topbar { display:flex;justify-content:space-between;align-items:center;padding:20px 25px;border-bottom:1px solid #ffffff0d;gap:12px }
-    .eyebrow { color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase }
-    h1 { font-size:clamp(19px,2.4vw,27px);margin:5px 0 0 }
-    .top-actions { display:flex;gap:8px;flex-wrap:wrap }
-    .workspace { display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;padding:22px 25px;min-height:0;flex:1;overflow:auto }
-    .lyrics-panel { min-width:0;display:flex;flex-direction:column;align-items:center }
-    .lyrics-heading { width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px }
-    .mode-switch { display:flex;gap:5px;background:#090d17aa;padding:4px;border:1px solid var(--line);border-radius:12px }
-    .mode-switch button { border:0;background:transparent;color:var(--muted);padding:8px 11px;border-radius:8px;font-size:11px;font-weight:700 }
-    .mode-switch button.active { color:white;background:var(--red) }
-    .lyrics-scroll { width:100%;max-width:720px;min-height:250px;overflow:auto;text-align:center;padding:40px 12px;scroll-behavior:smooth }
-    .lyric-line { color:#7c8495;font-size:clamp(18px,2.2vw,27px);font-weight:800;line-height:1.45;margin:19px 0;cursor:pointer;transition:.2s }
-    .lyric-line.active { color:white;text-shadow:0 0 22px #ff3b5570;transform:scale(1.025) }
-    .plain-lyrics { width:100%;max-width:680px;min-height:260px;resize:vertical;background:#090d1780;border:1px solid var(--line);border-radius:14px;color:#e8eaf1;padding:18px;line-height:1.9;outline:none }
-    .empty { color:var(--muted);max-width:450px;line-height:1.8;margin:auto;padding:50px 15px;text-align:center }
-    .editor { background:#0b101caa;border:1px solid var(--line);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0 }
-    .editor h2 { margin:0;font-size:14px }
-    .editor p { color:var(--muted);font-size:11px;line-height:1.6;margin:0 }
-    .editor textarea,.editor input { width:100%;background:#151d2b;border:1px solid var(--line);border-radius:9px;color:white;padding:10px;outline:none;font-size:12px }
-    .editor textarea { min-height:145px;resize:vertical;line-height:1.6 }
-    .editor textarea:focus,.editor input:focus { border-color:var(--red) }
-    .editor-row { display:flex;gap:7px;flex-wrap:wrap }
-    .editor-row button { flex:1;min-width:90px }
-    .player { grid-column:1/-1;display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.4fr) minmax(130px,1fr);align-items:center;padding:12px 20px;gap:15px }
-    .now-playing { display:flex;align-items:center;gap:12px;min-width:0 }
-    .cover { width:58px;height:58px;border-radius:10px;object-fit:cover;background:#242b3a }
-    .song-meta { min-width:0 }
-    .song-meta strong,.song-meta span { display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
-    .song-meta strong { font-size:13px }
-    .song-meta span { color:var(--muted);font-size:11px;margin-top:5px }
-    .controls { display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0 }
-    .control-buttons { display:flex;align-items:center;gap:17px }
-    .control-buttons button { border:0;background:none;color:#c5cad5;font-size:18px }
-    .control-buttons .play { width:37px;height:37px;border-radius:50%;background:white;color:#111;font-size:18px }
-    .progress { width:100%;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:10px }
-    input[type=range] { accent-color:var(--red);width:100%;cursor:pointer }
-    .volume { display:flex;align-items:center;justify-content:flex-end;gap:8px;color:var(--muted);font-size:13px }
-    .volume input { max-width:110px }
-    #youtube-player { position:fixed;width:1px;height:1px;left:-20px;bottom:-20px;opacity:.01;pointer-events:none }
-    .toast { position:fixed;bottom:115px;left:50%;transform:translateX(-50%);background:#202a3b;border:1px solid var(--line);padding:10px 15px;border-radius:10px;font-size:12px;display:none;z-index:5 }
-    @media(max-width:900px) {
-      .app { grid-template-columns:250px minmax(0,1fr) }
-      .workspace { grid-template-columns:1fr }
-      .editor { order:2 }
-      .lyrics-scroll { min-height:200px }
-    }
-    @media(max-width:650px) {
-      body { overflow:auto }
-      .app { height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto minmax(520px,1fr) auto;padding:7px;gap:7px }
-      .sidebar { min-height:260px;max-height:350px }
-      .main { min-height:650px }
-      .topbar { padding:16px }
-      .workspace { padding:15px;gap:14px }
-      .player { position:sticky;bottom:0;grid-column:1;grid-template-columns:1fr;gap:10px;padding:12px;background:#151b29;z-index:3 }
-      .now-playing { justify-content:center }
-      .volume { display:none }
+    :root{--bg:#080b14;--panel:#101522;--panel2:#171e2d;--line:#252e40;--red:#ff3b55;--red2:#d91f40;--white:#f6f7fb;--muted:#8e98aa}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--white);background:var(--bg);font-family:"DM Sans",sans-serif;overflow:hidden}
+    button,input,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{height:100vh;display:grid;grid-template-columns:310px minmax(0,1fr);grid-template-rows:minmax(0,1fr) 96px;gap:10px;padding:10px}
+    .sidebar,.main,.player{background:var(--panel);border:1px solid var(--line);border-radius:18px}
+    .sidebar{padding:20px 14px;display:flex;flex-direction:column;min-height:0;gap:18px}
+    .brand{display:flex;align-items:center;gap:11px;padding:0 7px 8px}
+    .brand-icon{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#438cff,#2454d9);box-shadow:0 8px 24px #2454d944;font-size:24px}
+    .brand-name{font-size:21px;font-weight:800;letter-spacing:1.5px}
+    .brand-name span{color:var(--red)}
+    .section-label{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;padding:0 9px}
+    .search{display:flex;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:7px}
+    .search input{min-width:0;width:100%;border:0;outline:0;background:transparent;color:white;padding:7px;font-size:13px}
+    .icon-btn,.primary-btn,.soft-btn{border:0;border-radius:10px;color:white;padding:9px 12px;background:var(--red);font-weight:700}
+    .icon-btn{width:39px;flex:none;font-size:18px}
+    .soft-btn{background:var(--panel2);border:1px solid var(--line);font-size:12px}
+    .soft-btn:hover{border-color:var(--red)}
+    .primary-btn:hover,.icon-btn:hover{background:var(--red2)}
+    .results{list-style:none;margin:0;padding:0;overflow:auto;min-height:100px}
+    .result{display:flex;align-items:center;gap:10px;padding:9px;border-radius:11px;cursor:pointer}
+    .result:hover{background:var(--panel2)}
+    .result img{width:49px;height:49px;object-fit:cover;border-radius:8px;background:#252c3a}
+    .result-info{min-width:0}
+    .result-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .result-sub{color:var(--muted);font-size:11px;margin-top:4px}
+    .hint{color:var(--muted);font-size:11px;line-height:1.6;padding:0 9px}
+    .main{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:radial-gradient(ellipse at 50% -20%,#38202e 0%,#151827 43%,#101522 78%)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:20px 25px;border-bottom:1px solid #ffffff0d;gap:12px}
+    .eyebrow{color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+    h1{font-size:clamp(19px,2.4vw,27px);margin:5px 0 0}
+    .top-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;padding:22px 25px;min-height:0;flex:1;overflow:auto}
+    .lyrics-panel{min-width:0;display:flex;flex-direction:column;align-items:center}
+    .lyrics-heading{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .mode-switch{display:flex;gap:5px;background:#090d17aa;padding:4px;border:1px solid var(--line);border-radius:12px}
+    .mode-switch button{border:0;background:transparent;color:var(--muted);padding:8px 11px;border-radius:8px;font-size:11px;font-weight:700}
+    .mode-switch button.active{color:white;background:var(--red)}
+    .lyrics-scroll{position:relative;width:100%;max-width:720px;min-height:250px;max-height:calc(100vh - 330px);overflow:auto;text-align:center;padding:30px 12px}
+    .tip{background:#ff3b5518;border:1px solid #ff3b5555;border-radius:12px;color:#ffc2cb;font-size:12px;line-height:1.6;padding:10px 14px;text-align:left}
+    .lrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0;cursor:pointer;border-radius:12px}
+    .lt{color:#7c8495;font-size:clamp(18px,2.2vw,27px);font-weight:800;line-height:1.4;transition:.2s}
+    .lrow.pending .lt{opacity:.55}
+    .lrow.active .lt{color:white;text-shadow:0 0 22px #ff3b5570;transform:scale(1.025)}
+    .mark .lrow{justify-content:flex-start;text-align:left;margin:8px 0;padding:6px 8px}
+    .mark .lrow:hover{background:var(--panel2)}
+    .mark .lt{font-size:16px}
+    .mark .lrow.next{outline:2px dashed var(--red)}
+    .ts{flex:none;font:700 11px ui-monospace,Consolas,monospace;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 7px}
+    .lrow.active .ts{color:white;border-color:var(--red)}
+    .nudge{display:flex;gap:4px;margin-left:auto;flex:none}
+    .nudge button{border:1px solid var(--line);background:var(--panel2);color:white;border-radius:7px;width:28px;height:28px;font-size:13px}
+    .plain-lyrics{width:100%;max-width:680px;min-height:260px;resize:vertical;background:#090d1780;border:1px solid var(--line);border-radius:14px;color:#e8eaf1;padding:18px;line-height:1.9;outline:none}
+    .empty{color:var(--muted);max-width:450px;line-height:1.8;margin:auto;padding:50px 15px;text-align:center}
+    .editor{background:#0b101caa;border:1px solid var(--line);border-radius:15px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0;align-self:start}
+    .editor h2{margin:0;font-size:14px}
+    .editor p{color:var(--muted);font-size:11px;line-height:1.6;margin:0}
+    .editor textarea,.editor input{width:100%;background:#151d2b;border:1px solid var(--line);border-radius:9px;color:white;padding:10px;outline:none;font-size:12px}
+    .editor textarea{min-height:145px;resize:vertical;line-height:1.6}
+    .editor textarea:focus,.editor input:focus{border-color:var(--red)}
+    .editor-row{display:flex;gap:7px;flex-wrap:wrap}
+    .editor-row button{flex:1;min-width:90px}
+    .player{grid-column:1/-1;display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.4fr) minmax(130px,1fr);align-items:center;padding:12px 20px;gap:15px}
+    .now-playing{display:flex;align-items:center;gap:12px;min-width:0}
+    .cover{width:58px;height:58px;border-radius:10px;object-fit:cover;background:#242b3a}
+    .song-meta{min-width:0}
+    .song-meta strong,.song-meta span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .song-meta strong{font-size:13px}
+    .song-meta span{color:var(--muted);font-size:11px;margin-top:5px}
+    .controls{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+    .control-buttons{display:flex;align-items:center;gap:17px}
+    .control-buttons button{border:0;background:none;color:#c5cad5;font-size:18px}
+    .control-buttons .play{width:37px;height:37px;border-radius:50%;background:white;color:#111}
+    .progress{width:100%;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:10px}
+    input[type=range]{accent-color:var(--red);width:100%;cursor:pointer}
+    .volume{display:flex;align-items:center;justify-content:flex-end;gap:8px;color:var(--muted);font-size:13px}
+    .volume input{max-width:110px}
+    #youtube-player{position:fixed;width:1px;height:1px;left:-20px;bottom:-20px;opacity:.01;pointer-events:none}
+    .toast{position:fixed;bottom:115px;left:50%;transform:translateX(-50%);background:#202a3b;border:1px solid var(--line);padding:10px 15px;border-radius:10px;font-size:12px;display:none;z-index:5}
+    @media(max-width:900px){.app{grid-template-columns:250px minmax(0,1fr)}.workspace{grid-template-columns:1fr}.editor{order:2}.lyrics-scroll{min-height:200px}}
+    @media(max-width:650px){
+      body{overflow:auto}
+      .app{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto minmax(520px,1fr) auto;padding:7px;gap:7px}
+      .sidebar{min-height:260px;max-height:350px}
+      .main{min-height:650px}
+      .topbar{padding:16px}
+      .workspace{padding:15px;gap:14px}
+      .player{position:sticky;bottom:0;grid-column:1;grid-template-columns:1fr;gap:10px;padding:12px;background:#151b29;z-index:3}
+      .now-playing{justify-content:center}
+      .volume{display:none}
     }
   </style>
 </head>
@@ -108,15 +109,13 @@
       <div class="brand"><div class="brand-icon">♫</div><div class="brand-name">SONA<span>RA</span></div></div>
       <div class="section-label">Buscar música en YouTube</div>
       <form class="search" id="search-form">
-        <input id="search-input" placeholder="Canción, artista o álbum..." autocomplete="off">
+        <input id="search-input" placeholder="Canción, artista o enlace de YouTube..." autocomplete="off">
         <button class="icon-btn" type="submit" aria-label="Buscar">⌕</button>
       </form>
-      <div class="side-actions">
-        <button class="soft-btn" id="clear-results">Limpiar resultados</button>
-      </div>
+      <button class="soft-btn" id="clear-results">Limpiar resultados</button>
       <div class="section-label">Resultados</div>
-      <ul class="results" id="results"><li class="hint">Busca una canción para ver los resultados aquí.</li></ul>
-      <p class="hint">Búsqueda gratuita sin clave API mediante instancias públicas de Invidious. La reproducción se realiza con el reproductor oficial de YouTube. La disponibilidad de los buscadores públicos puede variar.</p>
+      <ul class="results" id="results"><li class="hint">Busca una canción o pega un enlace de YouTube.</li></ul>
+      <p class="hint">Sin clave API. Si pegas un enlace (youtu.be, youtube.com/watch…), la canción carga al instante. La búsqueda por texto usa servicios públicos gratuitos, que pueden fallar a veces.</p>
     </aside>
 
     <main class="main">
@@ -129,31 +128,34 @@
           <div class="lyrics-heading">
             <span class="section-label">Letras de la canción</span>
             <div class="mode-switch">
-              <button id="sync-mode" class="active">Sincronizadas</button>
-              <button id="plain-mode">Texto plano</button>
+              <button id="m-play" class="active">Reproducir</button>
+              <button id="m-mark">Marcar tiempos</button>
+              <button id="m-plain">Texto plano</button>
             </div>
           </div>
           <div class="lyrics-scroll" id="lyrics-view">
-            <div class="empty">♫<br><br>Busca y reproduce una canción.<br>Después podrás escribir tus letras y sincronizarlas línea por línea.</div>
+            <div class="empty">♫<br><br>Busca y reproduce una canción.<br>Pega tus letras en el editor y márcalas tocando cada línea.</div>
           </div>
         </div>
         <aside class="editor">
           <h2>Editor de letras</h2>
-          <p>Escribe una letra por línea. En modo sincronizado, reproduce la canción y pulsa «Marcar línea» para asignar el tiempo actual.</p>
+          <p><b>1.</b> Pega la letra (un verso por línea) y pulsa «Aplicar letras».<br><b>2.</b> En «Marcar tiempos», reproduce la canción, pausa justo donde empieza el verso y toca esa línea. El tiempo se guarda solo.</p>
           <input id="lyrics-title" placeholder="Nombre de la canción">
-          <textarea id="lyrics-input" spellcheck="false" placeholder="Escribe o pega aquí las letras...&#10;Cada línea será una línea de la canción."></textarea>
+          <textarea id="lyrics-input" spellcheck="false" placeholder="Escribe o pega aquí las letras...&#10;Cada línea será un verso."></textarea>
           <div class="editor-row">
-            <button class="primary-btn" id="mark-line">● Marcar línea</button>
-            <button class="soft-btn" id="add-time">+ Tiempo manual</button>
-          </div>
-          <div class="editor-row">
-            <button class="soft-btn" id="render-lyrics">Aplicar letras</button>
+            <button class="primary-btn" id="render-lyrics">Aplicar letras</button>
             <button class="soft-btn" id="clear-lyrics">Borrar</button>
           </div>
-          <p>Formato LRC: <b>[mm:ss.xx]Texto de la línea</b>. También puedes pegar un LRC completo. Pulsa una línea sincronizada para saltar a ese momento.</p>
-          <input id="manual-time" placeholder="Tiempo manual (ej. 01:24.50)">
-          <div class="editor-row"><button class="soft-btn" id="import-lrc">Importar LRC</button><button class="soft-btn" id="export-lrc">Exportar LRC</button></div>
-          <p id="editor-status">Los cambios se guardan en este navegador cuando pulses «Guardar letras».</p>
+          <div class="editor-row">
+            <button class="soft-btn" id="back5">⏪ 5 s</button>
+            <button class="soft-btn" id="fwd5">5 s ⏩</button>
+          </div>
+          <div class="editor-row">
+            <button class="primary-btn" id="mark-line">● Marcar siguiente</button>
+            <button class="soft-btn" id="clear-times">Quitar tiempos</button>
+          </div>
+          <div class="editor-row"><button class="soft-btn" id="export-lrc">Exportar LRC</button><button class="soft-btn" id="copy-lrc">Copiar LRC</button></div>
+          <p id="editor-status">Puedes pegar un LRC completo y se leerá solo. Pulsa «Guardar letras» para conservarlas en este navegador.</p>
         </aside>
       </section>
     </main>
@@ -169,7 +171,7 @@
           <button class="play" id="play" title="Reproducir o pausar">▶</button>
           <button id="next" title="Siguiente">⏭</button>
         </div>
-        <div class="progress"><span id="current-time">0:00</span><input id="seek" type="range" min="0" max="100" value="0"><span id="duration">0:00</span></div>
+        <div class="progress"><span id="current-time">0:00</span><input id="seek" type="range" min="0" max="1000" value="0"><span id="duration">0:00</span></div>
       </div>
       <div class="volume">🔊 <input id="volume" type="range" min="0" max="100" value="75"></div>
     </footer>
@@ -178,265 +180,250 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // SONARA: búsqueda sin clave API mediante instancias públicas comunitarias.
-    const $ = (id) => document.getElementById(id);
-    const state = { player: null, ready: false,
-      results: [], index: -1, mode: 'sync', lyrics: [], timer: null, activeLine: -1, duration: 0 };
+    const $ = id => document.getElementById(id);
+    const state = { player:null, ready:false, pending:-1, results:[], index:-1, mode:'play', lyrics:[], active:-1, cursor:0, duration:0, seeking:false };
     const LRC_RE = /^\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\](.*)$/;
 
-    function toast(message) {
-      const el = $('toast'); el.textContent = message; el.style.display = 'block';
-      clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => el.style.display = 'none', 2600);
-    }
-    function formatTime(seconds) {
-      seconds = Math.max(0, Number(seconds) || 0);
-      return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2,'0')}`;
-    }
-    function parseTime(value) {
-      const m = String(value).trim().match(/^(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?$/);
-      if (!m) return null;
-      const fraction = m[3] ? Number('0.' + m[3]) : 0;
-      return Number(m[1]) * 60 + Number(m[2]) + fraction;
-    }
-    function parseLRC(text) {
-      const lines = [];
-      text.split(/\r?\n/).forEach(raw => {
-        const match = raw.match(LRC_RE);
-        if (!match) return;
-        const fraction = match[3] ? Number('0.' + match[3]) : 0;
-        lines.push({ time: Number(match[1]) * 60 + Number(match[2]) + fraction, text: match[4].trim() });
+    function toast(msg){ const el=$('toast'); el.textContent=msg; el.style.display='block'; clearTimeout(state.tt); state.tt=setTimeout(()=>el.style.display='none',2600); }
+    function formatTime(s){ s=Math.max(0,Number(s)||0); return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
+    function fmtLRC(t){ const cs=Math.round(t*100), m=Math.floor(cs/6000), s=Math.floor(cs%6000/100), c=cs%100; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(c).padStart(2,'0')}`; }
+    function parseLyrics(text){
+      return text.split(/\r?\n/).map(r=>r.trim()).filter(Boolean).map(raw=>{
+        const m=raw.match(LRC_RE);
+        if(!m) return {time:null,text:raw};
+        return {time:Number(m[1])*60+Number(m[2])+(m[3]?Number('0.'+m[3]):0),text:m[4].trim()};
       });
-      return lines.sort((a,b) => a.time - b.time);
     }
-    function toLRC(lines) {
-      return lines.map(line => {
-        const centiseconds = Math.floor((line.time % 1) * 100);
-        const total = Math.floor(line.time);
-        return `[${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}.${String(centiseconds).padStart(2,'0')}]${line.text}`;
-      }).join('\n');
+    function toLRC(){
+      return state.lyrics.filter(l=>l.time!=null).sort((a,b)=>a.time-b.time).map(l=>`[${fmtLRC(l.time)}]${l.text}`).join('\n');
     }
+    function escapeHTML(v){ return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-    // YouTube IFrame Player API
-    const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(tag);
-    window.onYouTubeIframeAPIReady = function() {
-      state.player = new YT.Player('youtube-player', {
-        width:'1', height:'1', videoId:'',
-        playerVars:{playsinline:1,controls:0,rel:0},
+    // ---------- Reproductor de YouTube ----------
+    const tag=document.createElement('script'); tag.src='https://www.youtube.com/iframe_api'; document.head.appendChild(tag);
+    window.onYouTubeIframeAPIReady=function(){
+      state.player=new YT.Player('youtube-player',{
+        width:'1',height:'1',videoId:'',playerVars:{playsinline:1,controls:0,rel:0},
         events:{
-          onReady:() => { state.ready = true; $('volume').value = 75; state.player.setVolume(75); },
-          onStateChange:(event) => {
-            if (event.data === YT.PlayerState.PLAYING) $('play').textContent = 'Ⅱ';
-            else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) $('play').textContent = '▶';
-            if (event.data === YT.PlayerState.ENDED) playIndex(state.index + 1);
+          onReady:()=>{ state.ready=true; state.player.setVolume(75); if(state.pending>=0){ const i=state.pending; state.pending=-1; playIndex(i); } },
+          onStateChange:e=>{
+            if(e.data===YT.PlayerState.PLAYING) $('play').textContent='Ⅱ';
+            else if(e.data===YT.PlayerState.PAUSED||e.data===YT.PlayerState.ENDED) $('play').textContent='▶';
+            if(e.data===YT.PlayerState.ENDED) playIndex(state.index+1);
           },
-          onError:() => toast('YouTube no pudo reproducir este video. Prueba otro resultado.')
+          onError:e=>toast([101,150].includes(e.data)?'El dueño del video no permite reproducirlo aquí. Prueba otro resultado.':'YouTube no pudo reproducir este video. Prueba otro resultado.')
         }
       });
     };
 
-    // Búsqueda sin API key: consulta instancias públicas de Invidious.
-    // Son servicios comunitarios; si una instancia falla, se prueba la siguiente.
-    const SEARCH_INSTANCES = [
-      'https://inv.nadeko.net',
-      'https://invidious.nerdvpn.de',
-      'https://inv.tux.pizza',
-      'https://invidious.privacyredirect.com'
+    // ---------- Búsqueda sin API key ----------
+    const withTimeout=(url,ms=9000)=>{ const c=new AbortController(), t=setTimeout(()=>c.abort(),ms); return fetch(url,{signal:c.signal}).finally(()=>clearTimeout(t)); };
+    const mk=(id,title,channel)=>({id:{videoId:id},snippet:{title,channelTitle:channel,thumbnails:{default:{url:`https://i.ytimg.com/vi/${id}/default.jpg`},medium:{url:`https://i.ytimg.com/vi/${id}/mqdefault.jpg`}}}});
+    const PROXIES=[
+      u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+      u=>'https://corsproxy.io/?url='+encodeURIComponent(u),
+      u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)
     ];
+    const PIPED=['https://pipedapi.kavin.rocks','https://pipedapi.adminforge.de','https://api.piped.private.coffee'];
+    const INVIDIOUS=['https://inv.nadeko.net','https://invidious.nerdvpn.de','https://yewtu.be'];
 
-    async function searchYouTube(query) {
-      $('results').innerHTML = '<li class="hint">Buscando gratis en YouTube...</li>';
-      let lastError = 'No se pudo conectar con los buscadores públicos.';
-      for (const instance of SEARCH_INSTANCES) {
-        try {
-          const url = new URL('/api/v1/search', instance);
-          url.search = new URLSearchParams({ q: query, type: 'video' });
-          const response = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
-          if (!response.ok) throw new Error(`Servidor respondió ${response.status}`);
-          const data = await response.json();
-          const videos = (Array.isArray(data) ? data : [])
-            .filter(item => item.type === 'video' && item.videoId)
-            .slice(0, 15)
-            .map(item => ({
-              id: { videoId: item.videoId },
-              snippet: {
-                title: item.title || 'Video sin título',
-                channelTitle: item.author || 'Canal de YouTube',
-                thumbnails: {
-                  default: { url: item.videoThumbnails?.[0]?.url || '' },
-                  medium: { url: item.videoThumbnails?.find(t => t.quality === 'medium')?.url || item.videoThumbnails?.[0]?.url || '' }
-                }
-              }
-            }));
-          if (!videos.length) {
-            state.results = [];
-            $('results').innerHTML = '<li class="hint">No se encontraron canciones para esa búsqueda.</li>';
-            return;
-          }
-          state.results = videos;
-          renderResults();
-          return;
-        } catch (error) {
-          lastError = error.message || lastError;
-        }
+    function findVideos(node,out){
+      if(!node||typeof node!=='object') return out;
+      const r=node.videoRenderer;
+      if(r&&r.videoId){ out.push(mk(r.videoId,r.title?.runs?.[0]?.text||'Sin título',r.ownerText?.runs?.[0]?.text||'YouTube')); return out; }
+      for(const k in node) findVideos(node[k],out);
+      return out;
+    }
+    async function viaScrape(proxy,q){
+      const yt='https://www.youtube.com/results?hl=es&sp=EgIQAQ%253D%253D&search_query='+encodeURIComponent(q);
+      const r=await withTimeout(proxy(yt)); if(!r.ok) throw new Error('proxy '+r.status);
+      const m=(await r.text()).match(/var ytInitialData\s*=\s*(\{.*?\});\s*<\/script>/s); if(!m) throw new Error('sin datos');
+      const v=findVideos(JSON.parse(m[1]),[]); if(!v.length) throw new Error('vacío'); return v;
+    }
+    async function viaPiped(base,q){
+      const r=await withTimeout(base+'/search?filter=videos&q='+encodeURIComponent(q)); if(!r.ok) throw new Error('piped '+r.status);
+      const v=((await r.json()).items||[]).filter(i=>i.url&&i.url.includes('v=')).map(i=>mk(i.url.split('v=')[1].split('&')[0],i.title,i.uploaderName));
+      if(!v.length) throw new Error('vacío'); return v;
+    }
+    async function viaInvidious(base,q){
+      const r=await withTimeout(base+'/api/v1/search?type=video&q='+encodeURIComponent(q)); if(!r.ok) throw new Error('invidious '+r.status);
+      const v=(await r.json()).filter(i=>i.type==='video'&&i.videoId).map(i=>mk(i.videoId,i.title,i.author));
+      if(!v.length) throw new Error('vacío'); return v;
+    }
+    function extractId(s){ const m=s.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/); return m?m[1]:null; }
+    async function loadDirect(id){
+      let title='Video de YouTube', ch='YouTube';
+      try{ const r=await withTimeout('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+id),6000); if(r.ok){ const d=await r.json(); title=d.title; ch=d.author_name; } }catch(_){}
+      state.results=[mk(id,title,ch)]; renderResults(); playIndex(0);
+    }
+    async function searchYouTube(query){
+      const id=extractId(query);
+      if(id){ $('results').innerHTML='<li class="hint">Cargando enlace...</li>'; return loadDirect(id); }
+      $('results').innerHTML='<li class="hint">Buscando en YouTube...</li>';
+      // Se lanzan todos los métodos a la vez y gana el primero que responda.
+      const tasks=[...PROXIES.map(p=>viaScrape(p,query)),...PIPED.map(b=>viaPiped(b,query)),...INVIDIOUS.map(b=>viaInvidious(b,query))];
+      try{
+        const found=await Promise.any(tasks), seen=new Set();
+        state.results=found.filter(v=>!seen.has(v.id.videoId)&&seen.add(v.id.videoId)).slice(0,15);
+        renderResults();
+      }catch(_){
+        state.results=[];
+        $('results').innerHTML='<li class="hint">No fue posible buscar ahora: los servicios públicos gratuitos están caídos o bloqueados.<br><br><b>Solución rápida:</b> abre YouTube, copia el enlace de la canción y pégalo aquí. Cargará al instante.</li>';
       }
-      state.results = [];
-      $('results').innerHTML = `<li class="hint">No fue posible buscar ahora. Los servicios gratuitos pueden estar temporalmente caídos o bloquear conexiones desde GitHub Pages. Inténtalo de nuevo más tarde.<br><br>Detalle: ${escapeHTML(lastError)}</li>`;
     }
-    function escapeHTML(value) {
-      return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-    }
-    function renderResults() {
-      $('results').innerHTML = '';
-      state.results.forEach((item,index) => {
-        const snippet = item.snippet;
-        const li = document.createElement('li'); li.className = 'result';
-        li.innerHTML = `<img src="${escapeHTML(snippet.thumbnails?.default?.url || '')}" alt=""><div class="result-info"><div class="result-title">${escapeHTML(snippet.title)}</div><div class="result-sub">${escapeHTML(snippet.channelTitle)}</div></div>`;
-        li.addEventListener('click', () => playIndex(index));
-        $('results').appendChild(li);
+    function renderResults(){
+      const ul=$('results'); ul.innerHTML='';
+      state.results.forEach((item,i)=>{
+        const s=item.snippet, li=document.createElement('li'); li.className='result';
+        li.innerHTML=`<img src="${escapeHTML(s.thumbnails.default.url)}" alt=""><div class="result-info"><div class="result-title">${escapeHTML(s.title)}</div><div class="result-sub">${escapeHTML(s.channelTitle)}</div></div>`;
+        li.addEventListener('click',()=>playIndex(i)); ul.appendChild(li);
       });
     }
-    function playIndex(index) {
-      if (!state.results.length) return;
-      if (index < 0) index = state.results.length - 1;
-      if (index >= state.results.length) index = 0;
-      state.index = index;
-      const item = state.results[index], s = item.snippet;
-      $('song-title').textContent = s.title;
-      $('song-artist').textContent = s.channelTitle;
-      $('top-title').textContent = s.title;
-      $('cover').src = s.thumbnails?.medium?.url || s.thumbnails?.default?.url || '';
-      if (state.player && state.ready) state.player.loadVideoById(item.id.videoId);
-      else toast('El reproductor todavía está cargando. Inténtalo de nuevo en unos segundos.');
-      $('lyrics-title').value = s.title;
-      $('play').textContent = 'Ⅱ';
+    function playIndex(index){
+      if(!state.results.length) return;
+      if(index<0) index=state.results.length-1;
+      if(index>=state.results.length) index=0;
+      state.index=index;
+      const item=state.results[index], s=item.snippet;
+      $('song-title').textContent=s.title; $('song-artist').textContent=s.channelTitle; $('top-title').textContent=s.title;
+      $('cover').src=s.thumbnails.medium.url; $('lyrics-title').value=s.title;
+      if(state.player&&state.ready){ state.player.loadVideoById(item.id.videoId); $('play').textContent='Ⅱ'; }
+      else{ state.pending=index; toast('El reproductor se está cargando, empezará solo...'); }
     }
-    function togglePlay() {
-      if (!state.player || !state.ready) return toast('El reproductor todavía está cargando.');
-      const status = state.player.getPlayerState();
-      if (status === YT.PlayerState.PLAYING) state.player.pauseVideo();
-      else if (state.index >= 0) state.player.playVideo();
-      else toast('Primero selecciona una canción.');
+    function togglePlay(){
+      if(!state.player||!state.ready) return toast('El reproductor todavía está cargando.');
+      if(state.index<0) return toast('Primero selecciona una canción.');
+      state.player.getPlayerState()===YT.PlayerState.PLAYING?state.player.pauseVideo():state.player.playVideo();
     }
-    function currentTime() {
-      return state.player && state.ready ? state.player.getCurrentTime() || 0 : 0;
+    const currentTime=()=>state.player&&state.ready?(state.player.getCurrentTime()||0):0;
+    const seekBy=d=>{ if(state.player&&state.ready) state.player.seekTo(Math.max(0,currentTime()+d),true); };
+
+    // ---------- Letras ----------
+    function nextPending(from){
+      for(let i=from;i<state.lyrics.length;i++) if(state.lyrics[i].time==null) return i;
+      for(let i=0;i<from;i++) if(state.lyrics[i].time==null) return i;
+      return state.lyrics.length;
     }
-    function addCurrentLine() {
-      const text = $('lyrics-input').value.split(/\r?\n/).filter(line => line.trim());
-      const already = state.lyrics.map(line => line.text);
-      const next = text.find(line => !already.includes(line.trim()));
-      if (!next) return toast('Escribe una línea nueva en el editor antes de marcarla.');
-      state.lyrics.push({time:currentTime(),text:next.trim()});
-      state.lyrics.sort((a,b) => a.time-b.time);
-      renderLyrics(); $('editor-status').textContent = `Línea marcada en ${formatTime(currentTime())}.`;
-    }
-    function renderLyrics() {
-      const view = $('lyrics-view'); view.innerHTML = '';
-      if (state.mode === 'plain') {
-        const area = document.createElement('textarea'); area.className = 'plain-lyrics';
-        area.value = $('lyrics-input').value; area.placeholder = 'Tus letras aparecerán aquí...';
-        area.addEventListener('input', () => $('lyrics-input').value = area.value);
-        view.appendChild(area); return;
+    function renderLyrics(){
+      const v=$('lyrics-view'), top=v.scrollTop; v.innerHTML=''; v.classList.toggle('mark',state.mode==='mark');
+      if(state.mode==='plain'){
+        const a=document.createElement('textarea'); a.className='plain-lyrics'; a.value=$('lyrics-input').value; a.placeholder='Tus letras aparecerán aquí...';
+        a.addEventListener('input',()=>$('lyrics-input').value=a.value); v.appendChild(a); return;
       }
-      if (!state.lyrics.length) {
-        view.innerHTML = '<div class="empty">Todavía no hay letras sincronizadas.<br>Escribe o pega las letras y marca cada línea mientras escuchas.</div>'; return;
-      }
-      state.lyrics.forEach((line,index) => {
-        const div = document.createElement('div'); div.className = 'lyric-line' + (index === state.activeLine ? ' active' : '');
-        div.textContent = line.text; div.title = formatTime(line.time);
-        div.addEventListener('click', () => { if (state.player && state.ready) state.player.seekTo(line.time,true); });
-        view.appendChild(div);
+      if(!state.lyrics.length){ v.innerHTML='<div class="empty">Todavía no hay letras.<br>Pega la letra en el editor y pulsa «Aplicar letras».</div>'; return; }
+      if(state.mode==='mark') v.insertAdjacentHTML('beforeend','<div class="tip">Reproduce la canción y <b>pausa justo donde empieza el verso</b>. Toca esa línea para guardar el tiempo. Ajusta con − / + o quítalo con ✕.</div>');
+      state.lyrics.forEach((l,i)=>{
+        const row=document.createElement('div'); row.className='lrow'; row.dataset.i=i;
+        row.innerHTML=state.mode==='mark'
+          ?`<span class="ts"></span><span class="lt"></span><span class="nudge"><button data-a="-" title="−0.2 s">−</button><button data-a="+" title="+0.2 s">+</button><button data-a="x" title="Quitar tiempo">✕</button></span>`
+          :`<span class="lt"></span>`;
+        row.querySelector('.lt').textContent=l.text; v.appendChild(row);
       });
-      const active = view.querySelector('.lyric-line.active');
-      if (active) active.scrollIntoView({behavior:'smooth',block:'center'});
+      paint(false); v.scrollTop=top;
     }
-    function updateLyrics() {
-      if (state.mode !== 'sync' || !state.lyrics.length) return;
-      const time = currentTime();
-      let active = -1;
-      for (let i=0;i<state.lyrics.length;i++) if (state.lyrics[i].time <= time) active = i; else break;
-      if (active !== state.activeLine) { state.activeLine = active; renderLyrics(); }
+    function paint(scroll){
+      const rows=$('lyrics-view').querySelectorAll('.lrow');
+      rows.forEach((row,i)=>{
+        const l=state.lyrics[i]; if(!l) return;
+        row.classList.toggle('active',i===state.active);
+        row.classList.toggle('pending',l.time==null);
+        row.classList.toggle('next',state.mode==='mark'&&i===state.cursor);
+        const ts=row.querySelector('.ts'); if(ts) ts.textContent=l.time==null?'--:--.--':fmtLRC(l.time);
+      });
+      if(!scroll) return;
+      const v=$('lyrics-view'), t=rows[state.mode==='mark'?state.cursor:state.active];
+      if(t) v.scrollTo({top:t.offsetTop-v.clientHeight/2+t.clientHeight/2,behavior:'smooth'});
     }
-    function setMode(mode) {
-      state.mode = mode;
-      $('sync-mode').classList.toggle('active',mode==='sync');
-      $('plain-mode').classList.toggle('active',mode==='plain');
-      renderLyrics();
+    function stamp(i){
+      if(!state.lyrics[i]) return toast('Ya marcaste todas las líneas.');
+      state.lyrics[i].time=currentTime();
+      state.cursor=nextPending(i+1);
+      paint(true); $('editor-status').textContent=`Línea ${i+1} marcada en ${fmtLRC(state.lyrics[i].time)}.`;
     }
-    function saveLyrics() {
-      const title = $('lyrics-title').value.trim() || $('song-title').textContent;
-      const payload = {title,plain:$('lyrics-input').value,lines:state.lyrics};
-      localStorage.setItem('sonara_lyrics_' + title.toLowerCase(),JSON.stringify(payload));
-      toast('Letras guardadas en este navegador.');
+    function nudge(i,a){
+      const l=state.lyrics[i]; if(!l) return;
+      if(a==='x'){ l.time=null; state.cursor=i; }
+      else{ if(l.time==null) return toast('Primero marca esta línea.'); l.time=Math.max(0,l.time+(a==='+'?0.2:-0.2)); if(state.player&&state.ready) state.player.seekTo(l.time,true); }
+      paint(true);
     }
-    function loadLyrics() {
-      const title = $('lyrics-title').value.trim() || $('song-title').textContent;
-      const raw = localStorage.getItem('sonara_lyrics_' + title.toLowerCase());
-      if (!raw) return toast('No hay letras guardadas con ese título.');
-      const data = JSON.parse(raw);
-      $('lyrics-input').value = data.plain || '';
-      state.lyrics = data.lines || [];
+    function setMode(m){
+      state.mode=m;
+      $('m-play').classList.toggle('active',m==='play'); $('m-mark').classList.toggle('active',m==='mark'); $('m-plain').classList.toggle('active',m==='plain');
+      state.cursor=nextPending(0); renderLyrics(); paint(true);
+    }
+    function applyLyrics(){
+      state.lyrics=parseLyrics($('lyrics-input').value); state.active=-1; state.cursor=nextPending(0);
+      const synced=state.lyrics.some(l=>l.time!=null);
+      $('editor-status').textContent=synced?'Letras con tiempos cargadas.':`${state.lyrics.length} líneas listas. Toca cada una al empezar su verso.`;
+      setMode(synced?'play':'mark');
+    }
+    function saveLyrics(){
+      const title=$('lyrics-title').value.trim()||$('song-title').textContent;
+      try{ localStorage.setItem('sonara_lyrics_'+title.toLowerCase(),JSON.stringify({title,plain:$('lyrics-input').value,lines:state.lyrics})); toast('Letras guardadas en este navegador.'); }
+      catch(_){ toast('No se pudo guardar en este navegador.'); }
+    }
+    function loadLyrics(){
+      const title=$('lyrics-title').value.trim()||$('song-title').textContent;
+      let raw=null; try{ raw=localStorage.getItem('sonara_lyrics_'+title.toLowerCase()); }catch(_){}
+      if(!raw) return toast('No hay letras guardadas con ese título.');
+      const d=JSON.parse(raw); $('lyrics-input').value=d.plain||''; state.lyrics=d.lines||[]; state.active=-1; state.cursor=nextPending(0);
       renderLyrics(); toast('Letras cargadas.');
     }
 
-    $('search-form').addEventListener('submit', event => {
-      event.preventDefault();
-      const query = $('search-input').value.trim();
-      if (query) searchYouTube(query);
-    });
-    $('clear-results').addEventListener('click',() => { state.results=[]; $('results').innerHTML='<li class="hint">Resultados limpiados.</li>'; });
+    // ---------- Eventos ----------
+    $('search-form').addEventListener('submit',e=>{ e.preventDefault(); const q=$('search-input').value.trim(); if(q) searchYouTube(q); });
+    $('clear-results').addEventListener('click',()=>{ state.results=[]; $('results').innerHTML='<li class="hint">Resultados limpiados.</li>'; });
     $('play').addEventListener('click',togglePlay);
-    $('previous').addEventListener('click',() => playIndex(state.index-1));
-    $('next').addEventListener('click',() => playIndex(state.index+1));
-    $('volume').addEventListener('input',event => { if(state.player && state.ready) state.player.setVolume(Number(event.target.value)); });
-    $('seek').addEventListener('input',event => {
-      if(state.player && state.ready && state.duration) state.player.seekTo(Number(event.target.value)/100*state.duration,true);
+    $('previous').addEventListener('click',()=>playIndex(state.index-1));
+    $('next').addEventListener('click',()=>playIndex(state.index+1));
+    $('volume').addEventListener('input',e=>{ if(state.player&&state.ready) state.player.setVolume(Number(e.target.value)); });
+    $('seek').addEventListener('input',e=>{ if(state.player&&state.ready&&state.duration) state.player.seekTo(Number(e.target.value)/1000*state.duration,true); });
+    $('m-play').addEventListener('click',()=>setMode('play'));
+    $('m-mark').addEventListener('click',()=>setMode('mark'));
+    $('m-plain').addEventListener('click',()=>setMode('plain'));
+    $('lyrics-view').addEventListener('click',e=>{
+      const row=e.target.closest('.lrow'); if(!row) return;
+      const i=Number(row.dataset.i), b=e.target.closest('button');
+      if(b) return nudge(i,b.dataset.a);
+      if(state.mode==='mark') return stamp(i);
+      const l=state.lyrics[i];
+      if(l.time==null) return toast('Esta línea aún no tiene tiempo. Usa «Marcar tiempos».');
+      if(state.player&&state.ready){ state.player.seekTo(l.time,true); state.player.playVideo(); }
     });
-    $('sync-mode').addEventListener('click',() => setMode('sync'));
-    $('plain-mode').addEventListener('click',() => setMode('plain'));
-    $('mark-line').addEventListener('click',addCurrentLine);
-    $('add-time').addEventListener('click',() => {
-      const time = parseTime($('manual-time').value);
-      const line = prompt('Texto de la línea para ese tiempo:');
-      if(time === null) return toast('Escribe un tiempo válido, por ejemplo 01:24.50.');
-      if(!line?.trim()) return;
-      state.lyrics.push({time,text:line.trim()}); state.lyrics.sort((a,b)=>a.time-b.time); renderLyrics();
+    $('mark-line').addEventListener('click',()=>{
+      if(!state.lyrics.length) return toast('Primero pega la letra y pulsa «Aplicar letras».');
+      if(state.mode!=='mark') setMode('mark');
+      stamp(state.cursor);
     });
-    $('render-lyrics').addEventListener('click',() => {
-      const raw = $('lyrics-input').value;
-      const parsed = parseLRC(raw);
-      if (parsed.length) state.lyrics = parsed;
-      else state.lyrics = [];
-      state.activeLine=-1; renderLyrics();
-      $('editor-status').textContent = parsed.length ? `${parsed.length} líneas LRC importadas.` : 'Texto aplicado. Marca los tiempos para sincronizarlo.';
-      toast(parsed.length ? 'Letras LRC aplicadas.' : 'Texto aplicado.');
-    });
-    $('clear-lyrics').addEventListener('click',() => {
-      $('lyrics-input').value=''; state.lyrics=[]; state.activeLine=-1; renderLyrics();
-    });
-    $('import-lrc').addEventListener('click',() => {
-      const parsed=parseLRC($('lyrics-input').value);
-      if(!parsed.length) return toast('No se detectaron marcas de tiempo LRC.');
-      state.lyrics=parsed; state.activeLine=-1; renderLyrics(); toast('LRC importado.');
-    });
-    $('export-lrc').addEventListener('click',() => {
-      if(!state.lyrics.length) return toast('No hay líneas sincronizadas para exportar.');
-      const blob=new Blob([toLRC(state.lyrics)],{type:'text/plain;charset=utf-8'});
-      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    $('back5').addEventListener('click',()=>seekBy(-5));
+    $('fwd5').addEventListener('click',()=>seekBy(5));
+    $('clear-times').addEventListener('click',()=>{ state.lyrics.forEach(l=>l.time=null); state.cursor=0; state.active=-1; renderLyrics(); toast('Tiempos eliminados.'); });
+    $('render-lyrics').addEventListener('click',applyLyrics);
+    $('clear-lyrics').addEventListener('click',()=>{ $('lyrics-input').value=''; state.lyrics=[]; state.active=-1; renderLyrics(); });
+    $('export-lrc').addEventListener('click',()=>{
+      const lrc=toLRC(); if(!lrc) return toast('Aún no hay líneas con tiempo para exportar.');
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lrc],{type:'text/plain;charset=utf-8'}));
       a.download=(($('lyrics-title').value||'letras').replace(/[^\w\-]+/g,'_'))+'.lrc'; a.click(); URL.revokeObjectURL(a.href);
+    });
+    $('copy-lrc').addEventListener('click',()=>{
+      const lrc=toLRC(); if(!lrc) return toast('Aún no hay líneas con tiempo para copiar.');
+      navigator.clipboard.writeText(lrc).then(()=>toast('LRC copiado.'),()=>toast('No se pudo copiar.'));
     });
     $('save-lyrics').addEventListener('click',saveLyrics);
     $('load-lyrics').addEventListener('click',loadLyrics);
-    setInterval(() => {
-      if(!state.player || !state.ready) return;
-      try {
-        state.duration=state.player.getDuration() || 0;
-        const time=currentTime();
-        $('current-time').textContent=formatTime(time);
-        $('duration').textContent=formatTime(state.duration);
-        $('seek').value=state.duration ? time/state.duration*100 : 0;
-        updateLyrics();
-      } catch (_) {}
+
+    setInterval(()=>{
+      if(!state.player||!state.ready) return;
+      try{
+        state.duration=state.player.getDuration()||0;
+        const t=currentTime();
+        $('current-time').textContent=formatTime(t); $('duration').textContent=formatTime(state.duration);
+        if(document.activeElement!==$('seek')) $('seek').value=state.duration?t/state.duration*1000:0;
+        if(state.mode==='plain') return;
+        let a=-1,best=-1;
+        state.lyrics.forEach((l,i)=>{ if(l.time!=null&&l.time<=t&&l.time>=best){ best=l.time; a=i; } });
+        if(a!==state.active){ state.active=a; paint(state.mode==='play'); }
+      }catch(_){}
     },250);
   </script>
 </body>
